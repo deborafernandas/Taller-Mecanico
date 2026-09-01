@@ -1,13 +1,18 @@
-from vehiculo import Vehiculo # Importa la clase Vehiculo desde el archivo local vehiculo.py
+from auto import Auto # Importa la clase Auto desde el archivo local auto.py
+from moto import Moto # Importa la clase Moto desde el archivo local moto.py
+from camion import Camion # Importa la clase Camion desde el archivo local camion.py
 
-vehiculo1 = Vehiculo("AB1234", 2018) # Instancia el primer objeto Vehiculo pasándole su patente y año
-vehiculo2 = Vehiculo("CD5678", 2020) # Instancia el segundo objeto Vehiculo pasándole su patente y año
-vehiculo3 = Vehiculo("EF9012", 2023) # Instancia el tercer objeto Vehiculo pasándole su patente y año
+# Instanciación de los objetos de cada clase derivada
+auto = Auto("AB1234", 2020, 500) # Instancia un objeto Auto pasándole patente y año
+moto = Moto("CD5678", 2021) # Instancia un objeto Moto pasándole patente y año
+camion = Camion("EF9012", 2019, 5000) # Instancia un objeto Camion pasándole patente y año
 
-print(vehiculo1.ingresar()) # Ejecuta ingresar() del primer vehículo y muestra el texto retornado en consola
-print(vehiculo2.ingresar()) # Ejecuta ingresar() del segundo vehículo y muestra el texto retornado en consola
-print(vehiculo3.ingresar()) # Ejecuta ingresar() del tercer vehículo y muestra el texto retornado en consola
+# Llamada al método ingresar() de cada vehículo
+print(auto.ingresar()) # Ejecuta ingresar() del auto y muestra el mensaje retornado en consola
+print(moto.ingresar()) # Ejecuta ingresar() de la moto y muestra el mensaje retornado en consola
+print(camion.ingresar()) # Ejecuta ingresar() del camión y muestra el mensaje retornado en consola
 
-print(f"Tarifa por hora del primer vehículo: ${vehiculo1.tarifa_hora()}") # Concatena e imprime la tarifa retornada por el primer vehículo
-print(f"Tarifa por hora del segundo vehículo: ${vehiculo2.tarifa_hora()}") # Concatena e imprime la tarifa retornada por el segundo vehículo
-print(f"Tarifa por hora del tercer vehículo: ${vehiculo3.tarifa_hora()}") # Concatena e imprime la tarifa retornada por el tercer vehículo
+# Llamada al método tarifa_hora() de cada vehículo
+print(f"Tarifa por hora del auto: ${auto.tarifa_hora()}") # Imprime la tarifa por hora del auto
+print(f"Tarifa por hora de la moto: ${moto.tarifa_hora()}") # Imprime la tarifa por hora de la moto
+print(f"Tarifa por hora del camión: ${camion.tarifa_hora()}") # Imprime la tarifa por hora del camión
