@@ -12,12 +12,19 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
 ### 8 de Septiembre de 2026
 - **Clases y Métodos Abstractos (Abstracción con ABC):**
   - **Clase Vehiculo (`vehiculo.py`):** Se convirtió en clase abstracta heredando de `ABC` (`from abc import ABC, abstractmethod`).
-  - Se definió `tarifa_hora()` como método abstracto utilizando el decorador `@abstractmethod`, estableciendo la obligación contractual de que cada clase derivada deba implementarlo y bloqueando la instanciación directa de la clase base.
-- **Actualización del Script de Pruebas (`main.py`):**
-  - Se implementó la captura controlada de la excepción `TypeError` mediante un bloque `try...except` para demostrar pedagógicamente que una clase abstracta no puede ser instanciada directamente.
-  - Se ajustaron las pruebas de tarifas invocando los métodos polimórficos de las clases derivadas (`Auto`, `Moto` y `Camion`).
+  - Se definió `tarifa_hora()` como método abstracto mediante el decorador `@abstractmethod` con tipado de retorno `-> int`, estableciendo la obligación contractual de implementación para las subclases e impidiendo la instanciación directa de `Vehiculo`.
+- **Encapsulamiento Seguro del Año (`@property` y `@anio.setter`):**
+  - **Clase Vehiculo (`vehiculo.py`):** Se implementaron el getter y setter para `anio`, validando que el año de fabricación esté entre 1900 y 2026 (lanzando `ValueError` en caso contrario), y asignándolo desde el constructor `__init__` mediante `self.anio = anio`.
+  - **Clase Auto (`auto.py`):** Se refactorizó la propiedad `restriccion` para interactuar limpiamente a través de `self.anio`, eliminando el uso de *name mangling* (`self._Vehiculo__anio`).
+- **Manejo Resiliente de Excepciones y Pruebas (`main.py`):**
+  - Se estructuraron bloques `try...except` controlados con mensajes claros de continuidad para demostrar la robustez del sistema ante:
+    1. Intento de instanciar directamente la clase abstracta `Vehiculo` (`TypeError`).
+    2. Validación de patente en el constructor al rechazar patentes cortas o con espacios (`ValueError`).
+    3. Validación de año en el constructor al rechazar años fuera del rango 1900-2026 (`ValueError`).
+    4. Simulación de ingreso de un auto antiguo (año 2008) registrando de forma controlada el aviso de restricción vehicular (`ValueError`).
+  - Se verificó que ninguna excepción interrumpe el flujo del taller mecánico, ejecutando con éxito todas las operaciones normales y métodos polimórficos de las subclases.
 - **Documentación:**
-  - Se mantuvieron los comentarios explicativos detallados en todas las modificaciones de código.
+  - Se mantuvieron y actualizaron comentarios explicativos línea por línea con fines educativos.
 
 ---
 

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class Vehiculo(ABC): # Define la clase Vehiculo
     def __init__(self, patente: str, anio: int): # Constructor que recibe patente y año al crear el objeto
         self.patente: str = patente # Asigna la patente a través del setter para ejecutar la validación
-        self.__anio: int = anio # Asigna el año recibido a un atributo privado
+        self.anio: int = anio # Asigna el año a través del setter para ejecutar la validación
         self.__en_taller: bool = False # Inicializa el estado en False (no está en el taller por defecto) como privado
 
     @property
@@ -15,6 +15,16 @@ class Vehiculo(ABC): # Define la clase Vehiculo
         if len(nueva_patente) < 6 or " " in nueva_patente: # Valida que tenga al menos 6 caracteres y no contenga espacios
             raise ValueError("La patente debe tener al menos 6 caracteres y no contener espacios.") # Lanza un error si no cumple las condiciones
         self.__patente: str = nueva_patente # Asigna la patente validada al atributo privado
+
+    @property
+    def anio(self) -> int: # Getter para acceder al atributo privado __anio
+        return self.__anio # Retorna el año de fabricación del vehículo
+
+    @anio.setter
+    def anio(self, nuevo_anio: int): # Setter para asignar y validar el año
+        if nuevo_anio < 1900 or nuevo_anio > 2026: # Valida que el año esté en un rango coherente
+            raise ValueError("El año de fabricación debe estar entre 1900 y 2026.") # Lanza un error si el año es inválido
+        self.__anio: int = nuevo_anio # Asigna el año validado al atributo privado
 
 
     def ingresar(self) -> str: # Método para registrar el ingreso del vehículo al taller

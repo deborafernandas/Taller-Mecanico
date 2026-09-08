@@ -7,12 +7,12 @@ class Auto(Vehiculo): # Define la clase Auto que hereda de la clase base Vehicul
 
     @property
     def restriccion(self) -> int: # Getter para obtener el año del auto
-        return self._Vehiculo__anio # Retorna el año del vehículo
+        return self.anio # Retorna el año del vehículo mediante la property de la clase base Vehiculo
 
     @restriccion.setter
     def restriccion(self, numero: int): # Setter para validar la restricción vehicular según el año
         if numero > 2011: # Valida que el número sea mayor a 2011
-            self._Vehiculo__anio = numero # Actualiza el año del vehículo
+            self.anio = numero # Actualiza el año del vehículo a través del setter validado de Vehiculo
             print("auto sin restriccion vehicular") # Muestra mensaje indicando que el auto no tiene restricción
         else:
             raise ValueError("auto sujeto a restriccion vehicular") # Lanza error si el auto está sujeto a restricción
