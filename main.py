@@ -3,8 +3,11 @@ from auto import Auto # Importa la clase Auto desde el archivo local auto.py
 from moto import Moto # Importa la clase Moto desde el archivo local moto.py
 from camion import Camion # Importa la clase Camion desde el archivo local camion.py
 
-# Instanciación de un objeto de la clase base para comparar la tarifa original
-vehiculo = Vehiculo("XY1234", 2015) # Instancia un objeto base Vehiculo pasándole patente y año
+# Intento de instanciación de la clase base abstracta (demostración didáctica de abstracción)
+try:
+    vehiculo = Vehiculo("XY1234", 2015) # Intenta instanciar la clase abstracta Vehiculo pasándole patente y año
+except TypeError as error:
+    print(f"Excepción capturada al instanciar clase abstracta: {error}") # Demuestra que una clase abstracta no se puede instanciar directamente
 
 # Instanciación de los objetos de cada clase derivada
 auto = Auto("AB1234", 2020, 500) # Instancia un objeto Auto pasándole patente, año y capacidad de maletero
@@ -19,8 +22,7 @@ print(camion.ingresar()) # Ejecuta ingresar() del camión y muestra el mensaje r
 pruebaEnc = camion.patente # Accede a la patente del camión a través de la property getter patente
 print(f"Patente del camión obtenida: {pruebaEnc}")
 
-# Llamada al método tarifa_hora() de cada vehículo para verificar la sobreescritura
-print(f"Tarifa por hora base (Vehiculo): ${vehiculo.tarifa_hora()}") # Imprime la tarifa base original (5000)
+# Llamada al método polimórfico tarifa_hora() de cada clase concreta derivada
 print(f"Tarifa por hora del auto: ${auto.tarifa_hora()}") # Imprime la tarifa por hora del auto sobrescrita (25000)
 print(f"Tarifa por hora de la moto: ${moto.tarifa_hora()}") # Imprime la tarifa por hora de la moto sobrescrita (15000)
 print(f"Tarifa por hora del camión: ${camion.tarifa_hora()}") # Imprime la tarifa por hora del camión sobrescrita (40000)

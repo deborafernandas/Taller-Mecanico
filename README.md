@@ -9,6 +9,18 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
 
 ## Bitácora de Avances
 
+### 8 de Septiembre de 2026
+- **Clases y Métodos Abstractos (Abstracción con ABC):**
+  - **Clase Vehiculo (`vehiculo.py`):** Se convirtió en clase abstracta heredando de `ABC` (`from abc import ABC, abstractmethod`).
+  - Se definió `tarifa_hora()` como método abstracto utilizando el decorador `@abstractmethod`, estableciendo la obligación contractual de que cada clase derivada deba implementarlo y bloqueando la instanciación directa de la clase base.
+- **Actualización del Script de Pruebas (`main.py`):**
+  - Se implementó la captura controlada de la excepción `TypeError` mediante un bloque `try...except` para demostrar pedagógicamente que una clase abstracta no puede ser instanciada directamente.
+  - Se ajustaron las pruebas de tarifas invocando los métodos polimórficos de las clases derivadas (`Auto`, `Moto` y `Camion`).
+- **Documentación:**
+  - Se mantuvieron los comentarios explicativos detallados en todas las modificaciones de código.
+
+---
+
 ### 7 de Septiembre de 2026
 - **Sobrescritura de Métodos (Polimorfismo):**
   - **Clase Auto (`auto.py`):** Se sobrescribió el método `tarifa_hora()` para retornar un valor entero de `25000`.

@@ -1,4 +1,6 @@
-class Vehiculo: # Define la clase Vehiculo
+from abc import ABC, abstractmethod
+
+class Vehiculo(ABC): # Define la clase Vehiculo
     def __init__(self, patente: str, anio: int): # Constructor que recibe patente y año al crear el objeto
         self.patente: str = patente # Asigna la patente a través del setter para ejecutar la validación
         self.__anio: int = anio # Asigna el año recibido a un atributo privado
@@ -27,5 +29,6 @@ class Vehiculo: # Define la clase Vehiculo
         self.__en_taller = False # Cambia el estado a False (fuera del taller)
         return "El vehículo ha sido entregado." # Devuelve mensaje de éxito
 
-    def tarifa_hora(self) -> int: # Método que retorna el costo de la tarifa por hora
-        return 5000 # Retorna un valor fijo de 5000
+    @abstractmethod
+    def tarifa_hora(self) -> int: # Método abstracto que retorna el costo de la tarifa por hora
+        pass
