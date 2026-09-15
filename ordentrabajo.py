@@ -1,4 +1,4 @@
-from vehiculo import Vehiculo
+from model.vehiculo import Vehiculo
 from usuario import Usuario
 from lineadetalle import LineaDetalle
 from repuesto import Repuesto

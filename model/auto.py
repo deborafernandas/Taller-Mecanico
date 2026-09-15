@@ -1,6 +1,6 @@
 from typing import Optional, Union
-from vehiculo import Vehiculo # Importa la clase base Vehiculo
-from modelo import Modelo # Importa la clase Modelo del dominio
+from model.vehiculo import Vehiculo # Importa la clase base Vehiculo
+from model.modelo import Modelo # Importa la clase Modelo del dominio
 
 class Auto(Vehiculo): # Define la clase Auto que hereda de Vehiculo
     def __init__(self, patente: str, anio: int, modelo: Optional[Union[Modelo, int]] = None, capacidad_maletero: int = 0):

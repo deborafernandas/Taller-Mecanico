@@ -1,6 +1,6 @@
 from typing import Optional
-from vehiculo import Vehiculo # Importa la clase base Vehiculo
-from modelo import Modelo # Importa la clase Modelo
+from model.vehiculo import Vehiculo # Importa la clase base Vehiculo
+from model.modelo import Modelo # Importa la clase Modelo
 
 class Moto(Vehiculo): # Define la clase Moto que hereda de Vehiculo
     def __init__(self, patente: str, anio: int, modelo: Optional[Modelo] = None):

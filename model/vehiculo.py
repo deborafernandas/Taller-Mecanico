@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from modelo import Modelo
+from model.modelo import Modelo
 
 class Vehiculo(ABC): # Define la clase base abstracta Vehiculo
     def __init__(self, patente: str, anio: int, modelo: Optional[Modelo] = None): # Constructor con patente, año y modelo
