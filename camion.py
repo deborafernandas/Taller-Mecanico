@@ -1,10 +1,19 @@
-from vehiculo import Vehiculo # Importa la clase base Vehiculo desde vehiculo.py
+from typing import Optional, Union
+from vehiculo import Vehiculo # Importa la clase base Vehiculo
+from modelo import Modelo # Importa la clase Modelo
 
-class Camion(Vehiculo): # Define la clase Camion que hereda de la clase base Vehiculo
-    def __init__(self, patente: str, anio: int, capacidad_carga: int): # Constructor que recibe patente, año y capacidad de carga en kilos
-        super().__init__(patente, anio) # Llama al constructor de la clase padre Vehiculo para inicializar patente y año
-        self.__capacidad_carga: int = capacidad_carga # Guarda la capacidad de carga en kilos como atributo privado
+class Camion(Vehiculo): # Define la clase Camion que hereda de Vehiculo
+    def __init__(self, patente: str, anio: int, modelo: Optional[Union[Modelo, int]] = None, capacidad_carga: int = 0):
+        if isinstance(modelo, int):
+            super().__init__(patente, anio, None)
+            self.__capacidad_carga: int = modelo
+        else:
+            super().__init__(patente, anio, modelo)
+            self.__capacidad_carga: int = capacidad_carga
 
-    def tarifa_hora(self) -> int: # Sobrescribe el método tarifa_hora para la clase Camion
-        return 40000 # Retorna la tarifa por hora específica para un camión (40000)
+    @property
+    def capacidad_carga(self) -> int: # Getter para capacidad de carga
+        return self.__capacidad_carga
 
+    def tarifa_hora(self) -> int: # Tarifa por hora específica para Camion
+        return 40000

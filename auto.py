@@ -1,22 +1,31 @@
-from vehiculo import Vehiculo # Importa la clase base Vehiculo desde vehiculo.py
+from typing import Optional, Union
+from vehiculo import Vehiculo # Importa la clase base Vehiculo
+from modelo import Modelo # Importa la clase Modelo del dominio
 
-class Auto(Vehiculo): # Define la clase Auto que hereda de la clase base Vehiculo
-    def __init__(self, patente: str, anio: int, capacidad_maletero: int): # Constructor que recibe patente, año y capacidad del maletero en litros
-        super().__init__(patente, anio) # Llama al constructor de la clase padre Vehiculo para inicializar patente y año
-        self.__capacidad_maletero: int = capacidad_maletero # Guarda la capacidad del maletero en litros como atributo privado
+class Auto(Vehiculo): # Define la clase Auto que hereda de Vehiculo
+    def __init__(self, patente: str, anio: int, modelo: Optional[Union[Modelo, int]] = None, capacidad_maletero: int = 0):
+        if isinstance(modelo, int):
+            super().__init__(patente, anio, None)
+            self.__capacidad_maletero: int = modelo
+        else:
+            super().__init__(patente, anio, modelo)
+            self.__capacidad_maletero: int = capacidad_maletero
 
     @property
-    def restriccion(self) -> int: # Getter para obtener el año del auto
-        return self.anio # Retorna el año del vehículo mediante la property de la clase base Vehiculo
+    def capacidad_maletero(self) -> int: # Getter para capacidad del maletero
+        return self.__capacidad_maletero
+
+    @property
+    def restriccion(self) -> int: # Getter para consultar año / restricción
+        return self.anio
 
     @restriccion.setter
-    def restriccion(self, numero: int): # Setter para validar la restricción vehicular según el año
-        if numero > 2011: # Valida que el número sea mayor a 2011
-            self.anio = numero # Actualiza el año del vehículo a través del setter validado de Vehiculo
-            print("auto sin restriccion vehicular") # Muestra mensaje indicando que el auto no tiene restricción
+    def restriccion(self, numero: int): # Setter para validar restricción vehicular
+        if numero > 2011:
+            self.anio = numero
+            print("auto sin restriccion vehicular")
         else:
-            raise ValueError("auto sujeto a restriccion vehicular") # Lanza error si el auto está sujeto a restricción
+            raise ValueError("auto sujeto a restriccion vehicular")
 
-    def tarifa_hora(self) -> int: # Sobrescribe el método tarifa_hora para la clase Auto
-        return 25000 # Retorna la tarifa por hora específica para un auto (25000)
-
+    def tarifa_hora(self) -> int: # Tarifa por hora específica para Auto
+        return 25000

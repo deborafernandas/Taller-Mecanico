@@ -1,6 +1,10 @@
-from vehiculo import Vehiculo # Importa la clase base Vehiculo desde vehiculo.py
+from typing import Optional
+from vehiculo import Vehiculo # Importa la clase base Vehiculo
+from modelo import Modelo # Importa la clase Modelo
 
 class Moto(Vehiculo): # Define la clase Moto que hereda de Vehiculo
-    def tarifa_hora(self) -> int: # Sobrescribe el método tarifa_hora para la clase Moto
-        return 15000 # Retorna la tarifa por hora específica para una moto (15000)
-
+    def __init__(self, patente: str, anio: int, modelo: Optional[Modelo] = None):
+        super().__init__(patente, anio, modelo)
+        
+    def tarifa_hora(self) -> int: # Tarifa por hora específica para Moto
+        return 15000
