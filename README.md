@@ -9,18 +9,54 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
 
 ## Bitácora de Avances
 
+### 15 de Septiembre de 2026
+- **Sincronización con Upstream e Integración del Modelo de Dominio Completo:**
+  - Se incorporaron las nuevas clases del modelo de dominio desarrolladas en upstream para la gestión integral del taller:
+    - **Clase Marca (`marca.py`) y Modelo (`modelo.py`):** Modelado de marcas y modelos con relación de composición/asociación jerárquica hacia los vehículos.
+    - **Clase Persona (`persona.py`), Cliente (`cliente.py`), Rol (`rol.py`) y Usuario (`usuario.py`):** Estructuración de actores del sistema, separando datos personales, clientes, roles con permisos y usuarios autenticables del taller.
+    - **Clase Repuesto (`repuesto.py`) y LineaDetalle (`lineadetalle.py`):** Control de inventario de repuestos con validación y descuento de stock, y líneas de detalle para asociar cantidades y precios unitarios.
+    - **Clase OrdenTrabajo (`ordentrabajo.py`):** Gestión de órdenes de reparación vinculadas a vehículos y mecánicos responsables; adición de horas hombre, consumo de repuestos y cálculo automático del costo total combinando mano de obra polimórfica (`tarifa_hora()`) e insumos.
+- **Fusión Armónica y Compatibilidad en Vehículos:**
+  - **Clase Vehiculo (`vehiculo.py`):** Se integró la referencia a `Modelo` manteniendo la clase base abstracta (`ABC`), el método abstracto `tarifa_hora()`, el encapsulamiento de patente y la validación segura de rango de años (1900 a 2027).
+  - **Clases Auto (`auto.py`), Camion (`camion.py`) y Moto (`moto.py`):** Se adaptaron para recibir `Modelo` garantizando compatibilidad con upstream, preservando los atributos específicos (`capacidad_maletero`, `capacidad_carga`), las tarifas horarias polimórficas y el control de restricción vehicular.
+- **Script de Pruebas Unificado (`main.py`):**
+  - Se unificó el script principal ejecutando en secuencia:
+    1. Pruebas de captura de excepciones controladas (`TypeError` por clase abstracta, `ValueError` por patente inválida y año fuera de rango).
+    2. Modelado de marcas, modelos y vehículos concretos.
+    3. Validación de restricción vehicular según año de fabricación.
+    4. Creación de personal, clientes y ciclo completo de una `OrdenTrabajo` con repuestos y cálculo de total.
+- **Sincronización y Respaldo Git:**
+  - Se crearon ramas de respaldo locales (`backup/origin-main`, `backup/origin-feature`).
+  - Se resolvió la fusión de ramas y se sincronizó `feature/desarrollo` con `origin` mediante GitHub CLI.
+
+---
+
+### 14 de Septiembre de 2026
+- **Integración con Base de Datos SQLite (`conectar.py`):**
+  - Se creó el archivo `conectar.py` para gestionar la conexión y operaciones con una base de datos SQLite local (`taller.db`).
+  - Se estableció la conexión a la base de datos con `sqlite3.connect("taller.db")`.
+  - Se creó la tabla `Vehiculo` con los campos `patente` (TEXT, clave primaria), `modelo` (TEXT) y `en_taller` (INTEGER), usando `CREATE TABLE IF NOT EXISTS` para evitar errores si ya existe.
+  - Se instanciaron objetos de las clases `Marca`, `Modelo` y `Auto` para preparar datos de prueba (Toyota Yaris, patente AB1235).
+  - Se realizó un `INSERT` de un vehículo en la tabla, pasando los valores como tupla de parámetros para prevenir inyección SQL.
+  - Se realizó una consulta `SELECT` filtrando por patente para verificar la inserción correcta.
+  - Se utilizó `fetchone()` para recuperar el registro y se imprimió en consola.
+  - Se corrigió un bug: los valores del `INSERT` estaban pasados como argumentos separados en lugar de una tupla, generando `TypeError`.
+- **Archivos involucrados:** `conectar.py`, `marca.py`, `modelo.py`, `auto.py`, `vehiculo.py`.
+
+---
+
 ### 8 de Septiembre de 2026
 - **Clases y Métodos Abstractos (Abstracción con ABC):**
   - **Clase Vehiculo (`vehiculo.py`):** Se convirtió en clase abstracta heredando de `ABC` (`from abc import ABC, abstractmethod`).
   - Se definió `tarifa_hora()` como método abstracto mediante el decorador `@abstractmethod` con tipado de retorno `-> int`, estableciendo la obligación contractual de implementación para las subclases e impidiendo la instanciación directa de `Vehiculo`.
 - **Encapsulamiento Seguro del Año (`@property` y `@anio.setter`):**
-  - **Clase Vehiculo (`vehiculo.py`):** Se implementaron el getter y setter para `anio`, validando que el año de fabricación esté entre 1900 y 2026 (lanzando `ValueError` en caso contrario), y asignándolo desde el constructor `__init__` mediante `self.anio = anio`.
+  - **Clase Vehiculo (`vehiculo.py`):** Se implementaron el getter y setter para `anio`, validando que el año de fabricación esté entre 1900 y 2027 (lanzando `ValueError` en caso contrario), y asignándolo desde el constructor `__init__` mediante `self.anio = anio`.
   - **Clase Auto (`auto.py`):** Se refactorizó la propiedad `restriccion` para interactuar limpiamente a través de `self.anio`, eliminando el uso de *name mangling* (`self._Vehiculo__anio`).
 - **Manejo Resiliente de Excepciones y Pruebas (`main.py`):**
   - Se estructuraron bloques `try...except` controlados con mensajes claros de continuidad para demostrar la robustez del sistema ante:
     1. Intento de instanciar directamente la clase abstracta `Vehiculo` (`TypeError`).
     2. Validación de patente en el constructor al rechazar patentes cortas o con espacios (`ValueError`).
-    3. Validación de año en el constructor al rechazar años fuera del rango 1900-2026 (`ValueError`).
+    3. Validación de año en el constructor al rechazar años fuera del rango 1900-2027 (`ValueError`).
     4. Simulación de ingreso de un auto antiguo (año 2008) registrando de forma controlada el aviso de restricción vehicular (`ValueError`).
   - Se verificó que ninguna excepción interrumpe el flujo del taller mecánico, ejecutando con éxito todas las operaciones normales y métodos polimórficos de las subclases.
 - **Documentación:**
@@ -52,7 +88,8 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
 ---
 
 ### 31 de Agosto de 2026
-- **Implementación de Herencia:**
+- **Creación de Rama de Trabajo:** Creación y publicación de la rama `feature/desarrollo`.
+- **Implementación de Herencia (Subclases):**
   - Se crearon tres clases derivadas a partir de la clase base `Vehiculo`:
     - **Clase Auto (`auto.py`):** Hereda de `Vehiculo`, define su propio constructor llamando a `super().__init__(patente, anio)` y añade el atributo privado `__capacidad_maletero` (en litros).
     - **Clase Moto (`moto.py`):** Hereda de `Vehiculo`, creada inicialmente con `pass`.
@@ -79,14 +116,3 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
   - Se importó la clase `Vehiculo` y se instanciaron 3 objetos con datos ficticios.
   - Se probó la invocación de métodos y la impresión de la tarifa por hora en consola.
 - **Documentación:** Se comentaron todas las líneas de código en ambos archivos (`vehiculo.py` y `main.py`) explicando paso a paso su funcionamiento con fines educativos.
-
-### 31 de Agosto de 2026
-- **Creación de Rama de Trabajo:** Creación y publicación de la rama `feature/desarrollo`.
-- **Implementación de Herencia (Subclases):**
-  - **Clase Auto (`auto.py`):** Hereda de `Vehiculo`, implementa su propio constructor invocando a `super()` y añade el atributo privado `__capacidad_maletero` (en litros).
-  - **Clase Moto (`moto.py`):** Hereda de `Vehiculo` (estructura base).
-  - **Clase Camion (`camion.py`):** Hereda de `Vehiculo`, implementa su propio constructor invocando a `super()` y añade el atributo privado `__capacidad_carga` (en kilos).
-- **Actualización de Script Principal (`main.py`):**
-  - Se importaron las subclases `Auto`, `Moto` y `Camion`.
-  - Se instanciaron objetos de cada una de las clases hijas y se verificó la invocación de métodos heredados (`ingresar()` y `tarifa_hora()`).
-- **Documentación:** Código comentado línea por línea con fines pedagógicos.
