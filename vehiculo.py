@@ -25,8 +25,8 @@ class Vehiculo(ABC): # Define la clase base abstracta Vehiculo
 
     @anio.setter
     def anio(self, nuevo_anio: int) -> None: # Setter con validación de rango de años
-        if nuevo_anio < 1900 or nuevo_anio > 2026:
-            raise ValueError("El año de fabricación debe estar entre 1900 y 2026.")
+        if nuevo_anio < 1900 or nuevo_anio > 2027:
+            raise ValueError("El año de fabricación debe estar entre 1900 y 2027.")
         self.__anio = nuevo_anio
 
     @property
