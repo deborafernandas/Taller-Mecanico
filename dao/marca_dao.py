@@ -1,4 +1,5 @@
 from dao.dao import Dao  # Importa la clase base Dao desde el módulo dao.dao
+from model.marca import Marca  # Importa la entidad Marca para reconstruir objetos de dominio
 
 class MarcaDao(Dao):  # Define la clase MarcaDao que hereda de Dao
     """
@@ -22,6 +23,41 @@ class MarcaDao(Dao):  # Define la clase MarcaDao que hereda de Dao
         self.cursor.execute(sql)  # Ejecuta la consulta SQL utilizando el cursor heredado
         self.conexion.commit()  # Confirma (guarda) los cambios en la base de datos utilizando la conexión heredada
 
-    def insertar(self, marca):
-        self.cursor.execute("INSERT INTO marcas (nombre) values (?)", (marca.nombre,))
-        marca.id=self.cursor.lastrowid
+    def insertar(self, marca: Marca):  # Inserta una nueva marca en la tabla
+        """
+        Inserta un registro en la tabla marcas y actualiza el atributo id del objeto.
+        """
+        self.cursor.execute("INSERT INTO marcas (nombre) values (?)", (marca.nombre,))  # Ejecuta el INSERT parametrizado
+        marca.id = self.cursor.lastrowid  # Obtiene el ID generado automáticamente por SQLite y lo asigna al modelo
+
+    def buscar(self, id: int):  # Busca una marca específica por su ID
+        """
+        Busca un registro en la tabla 'marcas' por su clave primaria.
+        Retorna un objeto Marca si existe, o None si no se encuentra.
+        """
+        sql = "SELECT id, nombre FROM marcas WHERE id = ?"  # Consulta parametrizada para buscar por ID
+        self.cursor.execute(sql, (id,))  # Ejecuta la consulta pasando el ID como tupla
+        fila = self.cursor.fetchone()  # Obtiene el primer (y único) registro coincidente
+        
+        if fila:  # Si la consulta encontró un registro
+            marca = Marca(fila[1])  # Reconstruye el objeto de dominio Marca con el nombre obtenido
+            marca.id = fila[0]  # Asigna el ID numérico correspondiente desde la base de datos
+            return marca  # Retorna el objeto Marca con todos sus datos cargados
+        return None  # Retorna None si no se encontró ningún registro con ese ID
+
+    def listar(self):  # Obtiene todos los registros de marcas existentes
+        """
+        Recupera todas las marcas almacenadas en la base de datos.
+        Retorna una lista de objetos Marca.
+        """
+        sql = "SELECT id, nombre FROM marcas"  # Consulta para seleccionar todas las filas de la tabla
+        self.cursor.execute(sql)  # Ejecuta la consulta SELECT
+        filas = self.cursor.fetchall()  # Recupera todas las filas como una lista de tuplas
+        
+        marcas = []  # Inicializa la lista donde se guardarán los objetos de dominio
+        for fila in filas:  # Itera sobre cada registro obtenido de la base de datos
+            marca = Marca(fila[1])  # Instancia el objeto Marca con el nombre
+            marca.id = fila[0]  # Asigna el ID a la instancia
+            marcas.append(marca)  # Agrega la marca a la lista de resultados
+            
+        return marcas  # Retorna la lista completa de objetos Marca

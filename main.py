@@ -15,7 +15,7 @@ def main():  # Función principal de ejecución
     # modelo_dao = ModeloDao(conn)  # Instancia ModeloDao entregando la conexión
     # auto_dao = AutoDao(conn)  # Instancia AutoDao entregando la conexión
     
-    # 3. Asegurar que la tabla exista antes de insertar
+    # 3. Asegurar que la tabla exista antes de operar
     marca_dao.crear_tabla()  
     
     # --- PRUEBA DEL MÉTODO INSERTAR ---
@@ -23,11 +23,35 @@ def main():  # Función principal de ejecución
     nueva_marca = Marca("Lexus")  # Instanciamos una nueva marca
     print(f"ID antes de insertar: {nueva_marca.id}")
     
-    marca_dao.insertar(nueva_marca)  # Llamamos al nuevo método insertar
+    marca_dao.insertar(nueva_marca)  # Llamamos al método insertar
     conn.commit()  # Guardamos los cambios en la base de datos
     
     print(f"Marca '{nueva_marca.nombre}' insertada exitosamente con el ID: {nueva_marca.id}")
     
+    # --- PRUEBA DEL MÉTODO LISTAR ---
+    print("\n--- Probando método listar en MarcaDao ---")
+    marcas = marca_dao.listar()  # Recupera todas las marcas de la tabla
+    print(f"Total de marcas encontradas: {len(marcas)}")
+    for m in marcas:  # Recorre e imprime cada objeto Marca recuperado
+        print(f"  - ID: {m.id} | Nombre: {m.nombre}")
+    
+    # --- PRUEBA DEL MÉTODO BUSCAR ---
+    print("\n--- Probando método buscar en MarcaDao ---")
+    id_a_buscar = nueva_marca.id  # Probamos buscar el ID recién insertado
+    marca_encontrada = marca_dao.buscar(id_a_buscar)  # Llama al método buscar
+    if marca_encontrada:
+        print(f"  [ÉXITO] Marca encontrada -> ID: {marca_encontrada.id}, Nombre: {marca_encontrada.nombre}")
+    else:
+        print(f"  [NO ENCONTRADO] No existe marca con el ID {id_a_buscar}")
+        
+    # Probamos buscar un ID inexistente para validar retorno None
+    id_inexistente = 9999
+    marca_no_existe = marca_dao.buscar(id_inexistente)
+    if marca_no_existe:
+        print(f"  [ÉXITO] Marca encontrada -> ID: {marca_no_existe.id}, Nombre: {marca_no_existe.nombre}")
+    else:
+        print(f"  [CONTROLADO] Búsqueda de ID {id_inexistente} retornó None (no existe en BD)")
+
     # --- RESTO DEL CÓDIGO COMENTADO PARA REFERENCIA ---
     # print("\nCreando resto de las tablas...")
     # modelo_dao.crear_tabla()  # Ejecuta la creación de la tabla modelos
