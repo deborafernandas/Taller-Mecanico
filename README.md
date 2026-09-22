@@ -9,6 +9,19 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
 
 ## Bitácora de Avances
 
+### 22 de Septiembre de 2026
+- **Sincronización e Integración de Arquitectura Completa:**
+  - Fusión de los avances del repositorio del docente (`michaelarjelm/Taller-Mecanico.git`), incorporando el paquete `dao` con la herencia relacional (`Dao`, `MarcaDao`, `ModeloDao`, `VehiculoDao`, `AutoDao`), el módulo de conexión con soporte de Foreign Keys (`conectar.py`), la reorganización de todas las clases de negocio en el paquete `model` y el documento de referencia `PROMPTS_MAESTROS.md`.
+  - Se mantuvieron de forma armónica las validaciones de negocio en `model/vehiculo.py` (patente y rango de años 1900-2027) y en `model/auto.py` (capacidad de maletero y restricción vehicular).
+- **Implementación de Consultas SELECT en Capa DAO (Buscar y Listar):**
+  - **`dao/marca_dao.py`:**
+    - Se implementó el método `buscar(id)`: ejecuta una consulta SQL parametrizada (`WHERE id = ?`), obtiene el registro mediante `fetchone()` y reconstruye el objeto de dominio `Marca` asignándole su `id` y `nombre`, retornando `None` si no existe.
+    - Se implementó el método `listar()`: ejecuta una consulta `SELECT id, nombre FROM marcas`, recupera todas las filas con `fetchall()` y genera una lista con todas las instancias de `Marca` mapeadas desde la base de datos.
+- **Actualización y Ejecución de Pruebas (`main.py`):**
+  - Se integró la verificación de inserción, listado completo de marcas en consola y búsqueda por ID (incluyendo validación controlada de valor `None` para IDs inexistentes).
+
+---
+
 ### 21 de Septiembre de 2026
 - **Implementación de método de Inserción (CRUD):**
   - **`marca_dao.py`:** Se agregó el método `insertar()` para registrar nuevas marcas en la base de datos y recuperar el ID generado automáticamente mediante `lastrowid`.
