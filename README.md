@@ -13,12 +13,21 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
 - **Sincronización e Integración de Arquitectura Completa:**
   - Fusión de los avances del repositorio del docente (`michaelarjelm/Taller-Mecanico.git`), incorporando el paquete `dao` con la herencia relacional (`Dao`, `MarcaDao`, `ModeloDao`, `VehiculoDao`, `AutoDao`), el módulo de conexión con soporte de Foreign Keys (`conectar.py`), la reorganización de todas las clases de negocio en el paquete `model` y el documento de referencia `PROMPTS_MAESTROS.md`.
   - Se mantuvieron de forma armónica las validaciones de negocio en `model/vehiculo.py` (patente y rango de años 1900-2027) y en `model/auto.py` (capacidad de maletero y restricción vehicular).
-- **Implementación de Consultas SELECT en Capa DAO (Buscar y Listar):**
+- **Implementación de Consultas SELECT y Métodos CRUD en Capa DAO:**
+  - **`model/modelo.py`:** Incorporación del atributo `__id` con su `@property` y setter para mapear la clave primaria autoincremental de la base de datos.
   - **`dao/marca_dao.py`:**
-    - Se implementó el método `buscar(id)`: ejecuta una consulta SQL parametrizada (`WHERE id = ?`), obtiene el registro mediante `fetchone()` y reconstruye el objeto de dominio `Marca` asignándole su `id` y `nombre`, retornando `None` si no existe.
-    - Se implementó el método `listar()`: ejecuta una consulta `SELECT id, nombre FROM marcas`, recupera todas las filas con `fetchall()` y genera una lista con todas las instancias de `Marca` mapeadas desde la base de datos.
-- **Actualización y Ejecución de Pruebas (`main.py`):**
-  - Se integró la verificación de inserción, listado completo de marcas en consola y búsqueda por ID (incluyendo validación controlada de valor `None` para IDs inexistentes).
+    - Método `buscar(id)`: ejecuta `SELECT ... WHERE id = ?`, obtiene el registro con `fetchone()` y reconstruye el objeto `Marca`, retornando `None` si no existe.
+    - Método `listar()`: ejecuta `SELECT id, nombre FROM marcas` con `fetchall()` y retorna la lista completa de instancias de `Marca`.
+  - **`dao/modelo_dao.py`:**
+    - Método `insertar(modelo)`: guarda el nombre y la clave foránea `marca_id` obtenida de `modelo.marca.id`, actualizando el `modelo.id` generado.
+    - Método `buscar(id)` con `INNER JOIN`: une `modelos` con `marcas` para recuperar en una sola consulta relacional la jerarquía completa y reconstruir tanto el objeto `Marca` como el objeto `Modelo`.
+  - **`dao/vehiculo_dao.py`:**
+    - Método `insertar(vehiculo)`: gestiona la persistencia en la tabla base `vehiculos` guardando `patente`, `anio`, `en_taller` y `modelo_id`.
+  - **`dao/auto_dao.py`:**
+    - Método `insertar(auto)`: aprovecha la herencia invocando a `super().insertar(auto)` para poblar la tabla padre `vehiculos` y registra la clave en la tabla hija `autos` (Table-per-type).
+    - Método `buscar(patente)` con multi-JOIN: realiza `INNER JOIN` entre `autos`, `vehiculos`, `modelos` y `marcas`, reconstruyendo toda la jerarquía de objetos (`Marca` -> `Modelo` -> `Auto`) con sus métodos polimórficos (`tarifa_hora()`).
+- **Actualización y Validación Integral (`main.py`):**
+  - Se estructuró un flujo de pruebas que inicializa las tablas, inserta registros encadenados (`Marca` -> `Modelo` -> `Auto`), valida las búsquedas por ID y patente mediante JOINs y comprueba el retorno controlado de `None` ante identificadores inexistentes.
 
 ---
 

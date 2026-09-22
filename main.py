@@ -1,74 +1,95 @@
 import conectar  # Importa el módulo conectar para inicializar la base de datos
 from dao.marca_dao import MarcaDao  # Importa el DAO de marcas
-# from dao.modelo_dao import ModeloDao  # Importa el DAO de modelos
-# from dao.auto_dao import AutoDao  # Importa el DAO de autos (que también gestiona vehículos)
+from dao.modelo_dao import ModeloDao  # Importa el DAO de modelos
+from dao.auto_dao import AutoDao  # Importa el DAO de autos (que también gestiona vehículos)
 from model.marca import Marca  # Importa el modelo Marca para instanciar objetos
+from model.modelo import Modelo  # Importa el modelo Modelo para instanciar objetos
+from model.auto import Auto  # Importa el modelo Auto para instanciar objetos
 
 def main():  # Función principal de ejecución
-    print("--- Inicializando Base de Datos ---")  # Mensaje de inicio
+    print("--- Inicializando Base de Datos ---")
     
     # 1. Crear conexión
-    conn = conectar.crear_conexion()  # Llama a crear_conexion para obtener el objeto de conexión
+    conn = conectar.crear_conexion()  # Obtiene la conexión SQLite con Foreign Keys activas
     
-    # 2. Instanciar el DAO pasándole la conexión
-    marca_dao = MarcaDao(conn)  # Instancia MarcaDao entregando la conexión
-    # modelo_dao = ModeloDao(conn)  # Instancia ModeloDao entregando la conexión
-    # auto_dao = AutoDao(conn)  # Instancia AutoDao entregando la conexión
+    # 2. Instanciar los DAOs pasándoles la conexión
+    marca_dao = MarcaDao(conn)  # Instancia MarcaDao
+    modelo_dao = ModeloDao(conn)  # Instancia ModeloDao
+    auto_dao = AutoDao(conn)  # Instancia AutoDao (crea tablas vehiculos y autos)
     
-    # 3. Asegurar que la tabla exista antes de operar
-    marca_dao.crear_tabla()  
+    # 3. Crear todas las tablas en orden relacional
+    marca_dao.crear_tabla()
+    modelo_dao.crear_tabla()
+    auto_dao.crear_tabla()
+    print("Tablas 'marcas', 'modelos', 'vehiculos' y 'autos' listas.\n")
     
-    # --- PRUEBA DEL MÉTODO INSERTAR ---
-    print("\n--- Probando método insertar en MarcaDao ---")
-    nueva_marca = Marca("Lexus")  # Instanciamos una nueva marca
-    print(f"ID antes de insertar: {nueva_marca.id}")
+    # =========================================================================
+    # PRUEBA 1: MARCADao (Insertar, Listar y Buscar)
+    # =========================================================================
+    print("=================== 1. PRUEBAS MARCADao ===================")
+    marca_toyota = Marca("Toyota")
+    marca_dao.insertar(marca_toyota)
+    conn.commit()
+    print(f"[INSERT] Marca '{marca_toyota.nombre}' creada con ID: {marca_toyota.id}")
     
-    marca_dao.insertar(nueva_marca)  # Llamamos al método insertar
-    conn.commit()  # Guardamos los cambios en la base de datos
-    
-    print(f"Marca '{nueva_marca.nombre}' insertada exitosamente con el ID: {nueva_marca.id}")
-    
-    # --- PRUEBA DEL MÉTODO LISTAR ---
-    print("\n--- Probando método listar en MarcaDao ---")
-    marcas = marca_dao.listar()  # Recupera todas las marcas de la tabla
-    print(f"Total de marcas encontradas: {len(marcas)}")
-    for m in marcas:  # Recorre e imprime cada objeto Marca recuperado
+    # Listar marcas
+    marcas = marca_dao.listar()
+    print(f"[LISTAR] Marcas registradas ({len(marcas)}):")
+    for m in marcas:
         print(f"  - ID: {m.id} | Nombre: {m.nombre}")
-    
-    # --- PRUEBA DEL MÉTODO BUSCAR ---
-    print("\n--- Probando método buscar en MarcaDao ---")
-    id_a_buscar = nueva_marca.id  # Probamos buscar el ID recién insertado
-    marca_encontrada = marca_dao.buscar(id_a_buscar)  # Llama al método buscar
-    if marca_encontrada:
-        print(f"  [ÉXITO] Marca encontrada -> ID: {marca_encontrada.id}, Nombre: {marca_encontrada.nombre}")
-    else:
-        print(f"  [NO ENCONTRADO] No existe marca con el ID {id_a_buscar}")
         
-    # Probamos buscar un ID inexistente para validar retorno None
-    id_inexistente = 9999
-    marca_no_existe = marca_dao.buscar(id_inexistente)
-    if marca_no_existe:
-        print(f"  [ÉXITO] Marca encontrada -> ID: {marca_no_existe.id}, Nombre: {marca_no_existe.nombre}")
+    # Buscar marca por ID
+    marca_buscada = marca_dao.buscar(marca_toyota.id)
+    if marca_buscada:
+        print(f"[BUSCAR] Marca ID {marca_toyota.id} encontrada: {marca_buscada.nombre}\n")
+        
+    # =========================================================================
+    # PRUEBA 2: MODELODao (Insertar y Buscar con JOIN a Marca)
+    # =========================================================================
+    print("=================== 2. PRUEBAS MODELODao (con JOIN) ===================")
+    modelo_yaris = Modelo("Yaris", marca_toyota)
+    modelo_dao.insertar(modelo_yaris)
+    conn.commit()
+    print(f"[INSERT] Modelo '{modelo_yaris.nombre}' creado con ID: {modelo_yaris.id} (Marca ID: {modelo_yaris.marca.id})")
+    
+    # Buscar modelo por ID con JOIN
+    modelo_buscado = modelo_dao.buscar(modelo_yaris.id)
+    if modelo_buscado:
+        print(f"[BUSCAR con JOIN] Modelo ID {modelo_buscado.id}:")
+        print(f"  - Nombre Modelo: {modelo_buscado.nombre}")
+        print(f"  - Marca asociada: {modelo_buscado.marca.nombre} (ID: {modelo_buscado.marca.id})\n")
     else:
-        print(f"  [CONTROLADO] Búsqueda de ID {id_inexistente} retornó None (no existe en BD)")
-
-    # --- RESTO DEL CÓDIGO COMENTADO PARA REFERENCIA ---
-    # print("\nCreando resto de las tablas...")
-    # modelo_dao.crear_tabla()  # Ejecuta la creación de la tabla modelos
-    # auto_dao.crear_tabla()  # Ejecuta la creación de las tablas vehiculos y autos (por herencia)
+        print(f"[BUSCAR] Modelo con ID {modelo_yaris.id} no encontrado.\n")
+        
+    # =========================================================================
+    # PRUEBA 3: AUTODao (Insertar y Buscar con multi-JOIN)
+    # =========================================================================
+    print("=================== 3. PRUEBAS AUTODao (con multi-JOIN) ===================")
+    auto_nuevo = Auto("AB1234", 2022, modelo_yaris)
+    auto_dao.insertar(auto_nuevo)
+    conn.commit()
+    print(f"[INSERT] Auto con patente '{auto_nuevo.patente}' registrado en 'vehiculos' y 'autos'.")
     
-    # 4. Validar que las tablas existan en la BD
-    # cursor = conn.cursor()  # Obtiene un cursor directamente desde la conexión para una consulta general
-    # cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")  # Consulta al maestro de SQLite por los nombres de las tablas
-    # tablas_creadas = [fila[0] for fila in cursor.fetchall()]  # Extrae los nombres de las tablas en una lista
-    
-    # print("\n--- Tablas encontradas en la Base de Datos ---")  # Mensaje informativo
-    # for tabla in tablas_creadas:  # Itera sobre la lista de tablas encontradas
-    #     # Excluimos la tabla interna de SQLite
-    #     if tabla != "sqlite_sequence":  # Ignora 'sqlite_sequence' que es una tabla del sistema
-    #         print(f"- {tabla}")  # Imprime el nombre de cada tabla de nuestro negocio
-    
-    print("\nProceso finalizado exitosamente.")  # Mensaje final de éxito
+    # Buscar auto por Patente con JOIN múltiple
+    auto_buscado = auto_dao.buscar("AB1234")
+    if auto_buscado:
+        print(f"[BUSCAR con multi-JOIN] Auto encontrado:")
+        print(f"  - Patente: {auto_buscado.patente}")
+        print(f"  - Año: {auto_buscado.anio}")
+        print(f"  - En taller: {auto_buscado._en_taller}")
+        print(f"  - Modelo: {auto_buscado.modelo.nombre}")
+        print(f"  - Marca: {auto_buscado.modelo.marca.nombre}")
+        print(f"  - Tarifa Hora Polimórfica: ${auto_buscado.tarifa_hora()}")
+    else:
+        print("[BUSCAR] Auto no encontrado.")
+        
+    # Prueba búsqueda controlada inexistente
+    patente_inexistente = "XX9999"
+    no_existe = auto_dao.buscar(patente_inexistente)
+    if no_existe is None:
+        print(f"\n[CONTROLADO] Búsqueda de patente '{patente_inexistente}' retornó None exitosamente.")
+        
+    print("\nProceso finalizado exitosamente.")
 
 if __name__ == "__main__":  # Verifica si el script se está ejecutando directamente
     main()  # Llama a la función principal
