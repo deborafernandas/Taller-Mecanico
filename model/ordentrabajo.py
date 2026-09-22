@@ -1,7 +1,7 @@
-from model.vehiculo import Vehiculo
-from usuario import Usuario
-from lineadetalle import LineaDetalle
-from repuesto import Repuesto
+from model.vehiculo import Vehiculo  # Import corregido hacia el paquete model
+from model.usuario import Usuario  # Import corregido hacia el paquete model
+from model.lineadetalle import LineaDetalle  # Import corregido hacia el paquete model
+from model.repuesto import Repuesto  # Import corregido hacia el paquete model
 
 class OrdenTrabajo:
     def __init__(self, numero: int, descripcion: str, vehiculo: Vehiculo, usuario: Usuario):

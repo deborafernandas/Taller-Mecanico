@@ -1,4 +1,4 @@
-from model.marca import Marca
+from model.marca import Marca  # Import corregido hacia el paquete model
 
 class Modelo:
     def __init__(self, nombre: str, marca: Marca):

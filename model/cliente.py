@@ -1,4 +1,4 @@
-from persona import Persona
+from model.persona import Persona  # Import corregido hacia el paquete model
 
 class Cliente:
     def __init__(self, persona: Persona):

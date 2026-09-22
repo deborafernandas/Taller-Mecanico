@@ -1,121 +1,50 @@
-from model.vehiculo import Vehiculo
-from model.marca import Marca
-from model.modelo import Modelo
-from model.auto import Auto
-from model.moto import Moto
-from model.camion import Camion
-from persona import Persona
-from cliente import Cliente
-from rol import Rol
-from usuario import Usuario
-from repuesto import Repuesto
-from ordentrabajo import OrdenTrabajo
+import conectar  # Importa el módulo conectar para inicializar la base de datos
+from dao.marca_dao import MarcaDao  # Importa el DAO de marcas
+# from dao.modelo_dao import ModeloDao  # Importa el DAO de modelos
+# from dao.auto_dao import AutoDao  # Importa el DAO de autos (que también gestiona vehículos)
+from model.marca import Marca  # Importa el modelo Marca para instanciar objetos
 
-def main():
-    # =====================================================================
-    # 1. Demostración de Abstracción Segura y Validaciones de Excepciones
-    # =====================================================================
-    print("--- PRUEBA 1: Instanciación de clase abstracta ---")
-    try:
-        vehiculo = Vehiculo("XY1234", 2015)
-    except TypeError as error:
-        print(f"[ERROR CONTROLADO] No se puede instanciar la clase abstracta 'Vehiculo': {error}")
-        print("-> Confirmación: Abstracción verificada exitosamente.\n")
+def main():  # Función principal de ejecución
+    print("--- Inicializando Base de Datos ---")  # Mensaje de inicio
+    
+    # 1. Crear conexión
+    conn = conectar.crear_conexion()  # Llama a crear_conexion para obtener el objeto de conexión
+    
+    # 2. Instanciar el DAO pasándole la conexión
+    marca_dao = MarcaDao(conn)  # Instancia MarcaDao entregando la conexión
+    # modelo_dao = ModeloDao(conn)  # Instancia ModeloDao entregando la conexión
+    # auto_dao = AutoDao(conn)  # Instancia AutoDao entregando la conexión
+    
+    # 3. Asegurar que la tabla exista antes de insertar
+    marca_dao.crear_tabla()  
+    
+    # --- PRUEBA DEL MÉTODO INSERTAR ---
+    print("\n--- Probando método insertar en MarcaDao ---")
+    nueva_marca = Marca("Lexus")  # Instanciamos una nueva marca
+    print(f"ID antes de insertar: {nueva_marca.id}")
+    
+    marca_dao.insertar(nueva_marca)  # Llamamos al nuevo método insertar
+    conn.commit()  # Guardamos los cambios en la base de datos
+    
+    print(f"Marca '{nueva_marca.nombre}' insertada exitosamente con el ID: {nueva_marca.id}")
+    
+    # --- RESTO DEL CÓDIGO COMENTADO PARA REFERENCIA ---
+    # print("\nCreando resto de las tablas...")
+    # modelo_dao.crear_tabla()  # Ejecuta la creación de la tabla modelos
+    # auto_dao.crear_tabla()  # Ejecuta la creación de las tablas vehiculos y autos (por herencia)
+    
+    # 4. Validar que las tablas existan en la BD
+    # cursor = conn.cursor()  # Obtiene un cursor directamente desde la conexión para una consulta general
+    # cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")  # Consulta al maestro de SQLite por los nombres de las tablas
+    # tablas_creadas = [fila[0] for fila in cursor.fetchall()]  # Extrae los nombres de las tablas en una lista
+    
+    # print("\n--- Tablas encontradas en la Base de Datos ---")  # Mensaje informativo
+    # for tabla in tablas_creadas:  # Itera sobre la lista de tablas encontradas
+    #     # Excluimos la tabla interna de SQLite
+    #     if tabla != "sqlite_sequence":  # Ignora 'sqlite_sequence' que es una tabla del sistema
+    #         print(f"- {tabla}")  # Imprime el nombre de cada tabla de nuestro negocio
+    
+    print("\nProceso finalizado exitosamente.")  # Mensaje final de éxito
 
-    print("--- PRUEBA 2: Validación de patente en constructor ---")
-    try:
-        auto_invalido = Auto("AB 1", 2022)
-    except ValueError as error:
-        print(f"[ERROR CONTROLADO] Error al validar patente: {error}")
-        print("-> Confirmación: Patente inválida rechazada correctamente.\n")
-
-    print("--- PRUEBA 3: Validación de año en constructor ---")
-    try:
-        moto_invalida = Moto("CD5678", 1850)
-    except ValueError as error:
-        print(f"[ERROR CONTROLADO] Error al validar año: {error}")
-        print("-> Confirmación: Año inválido rechazado correctamente.\n")
-
-    # =====================================================================
-    # 2. Creación de Marcas y Modelos del Dominio
-    # =====================================================================
-    print("--- CREACIÓN DE MODELO DE DOMINIO ---")
-    marca_toyota = Marca("Toyota")
-    modelo_yaris = Modelo("Yaris", marca_toyota)
-
-    marca_honda = Marca("Honda")
-    modelo_cbr = Modelo("CBR500R", marca_honda)
-
-    marca_volvo = Marca("Volvo")
-    modelo_fh = Modelo("FH16", marca_volvo)
-
-    # =====================================================================
-    # 3. Instanciación de Vehículos con sus Modelos
-    # =====================================================================
-    auto = Auto("AB1234", 2018, modelo_yaris, capacidad_maletero=450)
-    moto = Moto("CD5678", 2020, modelo_cbr)
-    camion = Camion("EF9012", 2023, modelo_fh, capacidad_carga=5000)
-
-    # =====================================================================
-    # 4. Pruebas de Ingreso al Taller
-    # =====================================================================
-    print("--- Ingreso de Vehículos ---")
-    print(auto.ingresar())
-    print(moto.ingresar())
-    print(camion.ingresar())
-    print()
-
-    # =====================================================================
-    # 5. Pruebas de Tarifas Polimórficas
-    # =====================================================================
-    print("--- Tarifas por Hora ---")
-    print(f"Tarifa Auto ({auto.modelo.marca.nombre} {auto.modelo.nombre}): ${auto.tarifa_hora()}")
-    print(f"Tarifa Moto ({moto.modelo.marca.nombre} {moto.modelo.nombre}): ${moto.tarifa_hora()}")
-    print(f"Tarifa Camión ({camion.modelo.marca.nombre} {camion.modelo.nombre}): ${camion.tarifa_hora()}")
-    print()
-
-    # =====================================================================
-    # 6. Verificación de Restricción Vehicular
-    # =====================================================================
-    print("--- Verificación de Restricción Vehicular ---")
-    print(f"Año del auto registrado ({auto.patente}): {auto.restriccion}")
-    auto.restriccion = 2020
-
-    auto_antiguo = Auto("ZZ9988", 2008, modelo_yaris)
-    print(f"Llega al taller auto patente {auto_antiguo.patente} (año {auto_antiguo.restriccion}).")
-    try:
-        auto_antiguo.restriccion = 2008
-    except ValueError as error:
-        print(f"[RESTRICCIÓN CONTROLADA] {error}")
-    print()
-
-    # =====================================================================
-    # 7. Crear Personas, Clientes y Usuarios
-    # =====================================================================
-    persona_mecanico = Persona("12.345.678-9", "Juan Mecánico")
-    rol_mecanico = Rol("Mecánico", ["reparar", "cerrar_orden"])
-    usuario_mecanico = Usuario("juanm", "hash123", rol_mecanico, persona_mecanico)
-
-    persona_cliente = Persona("9.876.543-2", "Pedro Cliente")
-    cliente_pedro = Cliente(persona_cliente)
-
-    # =====================================================================
-    # 8. Gestión de Orden de Trabajo y Repuestos
-    # =====================================================================
-    print("--- Gestión de Orden de Trabajo ---")
-    orden1 = OrdenTrabajo(1, "Cambio de aceite y pastillas", auto, usuario_mecanico)
-    orden1.agregar_horas(3)
-
-    filtro = Repuesto("F-001", "Filtro de Aceite", 10, False)
-    pastillas = Repuesto("P-002", "Pastillas de freno", 5, True)
-
-    orden1.agregar_repuesto(1, 15000, filtro)
-    orden1.agregar_repuesto(1, 45000, pastillas)
-
-    print(f"Total de Orden #1 (Mano de obra + Repuestos): ${orden1.total()}")
-    orden1.cerrar()
-    print("Orden cerrada exitosamente.\n")
-    print("-> Todas las pruebas y operaciones se completaron con éxito.")
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__":  # Verifica si el script se está ejecutando directamente
+    main()  # Llama a la función principal

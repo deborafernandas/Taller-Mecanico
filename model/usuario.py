@@ -1,5 +1,5 @@
-from rol import Rol
-from persona import Persona
+from model.rol import Rol  # Import corregido hacia el paquete model
+from model.persona import Persona  # Import corregido hacia el paquete model
 
 class Usuario:
     def __init__(self, usuario: str, password_hash: str, rol: Rol, persona: Persona):
