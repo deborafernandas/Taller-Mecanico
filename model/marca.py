@@ -14,3 +14,8 @@ class Marca:
     @property
     def nombre(self) -> str:
         return self.__nombre
+
+    @nombre.setter
+    def nombre(self, valor: str) -> None:
+        self.__nombre = valor
+

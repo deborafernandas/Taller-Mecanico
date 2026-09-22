@@ -15,9 +15,11 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
   - Se mantuvieron de forma armónica las validaciones de negocio en `model/vehiculo.py` (patente y rango de años 1900-2027) y en `model/auto.py` (capacidad de maletero y restricción vehicular).
 - **Implementación de Consultas SELECT y Métodos CRUD en Capa DAO:**
   - **`model/modelo.py`:** Incorporación del atributo `__id` con su `@property` y setter para mapear la clave primaria autoincremental de la base de datos.
+  - **`model/marca.py`:** Incorporación del setter para el atributo `nombre` permitiendo la modificación del estado del objeto de dominio.
   - **`dao/marca_dao.py`:**
     - Método `buscar(id)`: ejecuta `SELECT ... WHERE id = ?`, obtiene el registro con `fetchone()` y reconstruye el objeto `Marca`, retornando `None` si no existe.
     - Método `listar()`: ejecuta `SELECT id, nombre FROM marcas` con `fetchall()` y retorna la lista completa de instancias de `Marca`.
+    - Método `actualizar(nueva_marca)`: ejecuta `UPDATE marcas SET nombre = ? WHERE id = ?`, valida con `cursor.rowcount > 0` la existencia y modificación del registro, realiza el `commit()` y retorna el registro fresco usando `buscar(nueva_marca.id)` (retornando `None` si el ID no existe).
   - **`dao/modelo_dao.py`:**
     - Método `insertar(modelo)`: guarda el nombre y la clave foránea `marca_id` obtenida de `modelo.marca.id`, actualizando el `modelo.id` generado.
     - Método `buscar(id)` con `INNER JOIN`: une `modelos` con `marcas` para recuperar en una sola consulta relacional la jerarquía completa y reconstruir tanto el objeto `Marca` como el objeto `Modelo`.

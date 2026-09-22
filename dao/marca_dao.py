@@ -40,7 +40,7 @@ class MarcaDao(Dao):  # Define la clase MarcaDao que hereda de Dao
         fila = self.cursor.fetchone()  # Obtiene el primer (y único) registro coincidente
         
         if fila:  # Si la consulta encontró un registro
-            marca = Marca(fila[1])  # Reconstruye el objeto de dominio Marca con el nombre obtenido
+            marca = Marca(fila[1])  # Reconstruye el objeto de dominio Marca con el nombre obtenido, instanciar
             marca.id = fila[0]  # Asigna el ID numérico correspondiente desde la base de datos
             return marca  # Retorna el objeto Marca con todos sus datos cargados
         return None  # Retorna None si no se encontró ningún registro con ese ID
@@ -61,3 +61,18 @@ class MarcaDao(Dao):  # Define la clase MarcaDao que hereda de Dao
             marcas.append(marca)  # Agrega la marca a la lista de resultados
             
         return marcas  # Retorna la lista completa de objetos Marca
+
+    def actualizar(self, nueva_marca: Marca):  # Actualiza los datos de una marca existente
+        """
+        Actualiza el nombre de una marca en la base de datos según su ID.
+        Valida mediante cursor.rowcount si se modificó alguna fila y retorna el objeto actualizado.
+        Retorna None si el ID no existe en la base de datos.
+        """
+        sql = "UPDATE marcas SET nombre = ? WHERE id = ?"
+        self.cursor.execute(sql, (nueva_marca.nombre, nueva_marca.id))
+        
+        if self.cursor.rowcount > 0:  # Valida que al menos una fila haya sido afectada por la sentencia
+            self.conexion.commit()  # Confirma y persiste los cambios en la base de datos
+            return self.buscar(nueva_marca.id)  # Retorna el registro fresco consultado desde la BD
+            
+        return None  # Retorna None si el registro con ese ID no existía

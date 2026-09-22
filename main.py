@@ -41,7 +41,22 @@ def main():  # Función principal de ejecución
     # Buscar marca por ID
     marca_buscada = marca_dao.buscar(marca_toyota.id)
     if marca_buscada:
-        print(f"[BUSCAR] Marca ID {marca_toyota.id} encontrada: {marca_buscada.nombre}\n")
+        print(f"[BUSCAR] Marca ID {marca_toyota.id} encontrada: {marca_buscada.nombre}")
+        
+    # Actualizar marca existente
+    marca_toyota.nombre = "Toyota Gazoo"
+    marca_actualizada = marca_dao.actualizar(marca_toyota)
+    if marca_actualizada:
+        print(f"[ACTUALIZAR] Marca ID {marca_actualizada.id} actualizada a: '{marca_actualizada.nombre}'")
+    else:
+        print("[ACTUALIZAR] No se pudo actualizar la marca.")
+        
+    # Intentar actualizar un ID inexistente
+    marca_inexistente = Marca("Fantasma")
+    marca_inexistente.id = 9999
+    res_falsa = marca_dao.actualizar(marca_inexistente)
+    if res_falsa is None:
+        print(f"[CONTROLADO] Actualización de ID inexistente (9999) retornó None exitosamente.\n")
         
     # =========================================================================
     # PRUEBA 2: MODELODao (Insertar y Buscar con JOIN a Marca)
