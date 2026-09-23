@@ -56,7 +56,25 @@ def main():  # Función principal de ejecución
     marca_inexistente.id = 9999
     res_falsa = marca_dao.actualizar(marca_inexistente)
     if res_falsa is None:
-        print(f"[CONTROLADO] Actualización de ID inexistente (9999) retornó None exitosamente.\n")
+        print(f"[CONTROLADO] Actualización de ID inexistente (9999) retornó None exitosamente.")
+        
+    # Prueba eliminar marca existente
+    marca_temp = Marca("MarcaTemporal")
+    marca_dao.insertar(marca_temp)
+    conn.commit()
+    print(f"[INSERT TEMPORAL] Marca '{marca_temp.nombre}' creada con ID: {marca_temp.id}")
+    
+    if marca_dao.eliminar(marca_temp.id):
+        print(f"[ELIMINAR] Marca ID {marca_temp.id} eliminada con éxito.")
+    else:
+        print(f"[ELIMINAR] No se pudo eliminar la marca ID {marca_temp.id}.")
+        
+    if marca_dao.buscar(marca_temp.id) is None:
+        print(f"[CONFIRMACIÓN] Búsqueda de ID {marca_temp.id} tras eliminación retornó None.")
+        
+    # Prueba eliminar ID inexistente
+    if not marca_dao.eliminar(9999):
+        print(f"[CONTROLADO] Intento de eliminar ID inexistente (9999) retornó False exitosamente.\n")
         
     # =========================================================================
     # PRUEBA 2: MODELODao (Insertar y Buscar con JOIN a Marca)
@@ -104,6 +122,11 @@ def main():  # Función principal de ejecución
     if no_existe is None:
         print(f"\n[CONTROLADO] Búsqueda de patente '{patente_inexistente}' retornó None exitosamente.")
         
+    # Prueba de restricción de clave foránea (Foreign Key)
+    print("\n--- Prueba de Seguridad: Intentar eliminar marca con modelos asociados ---")
+    if not marca_dao.eliminar(marca_toyota.id):
+        print("[CONTROLADO] El sistema bloqueó la eliminación para proteger la integridad referencial.")
+
     print("\nProceso finalizado exitosamente.")
 
 if __name__ == "__main__":  # Verifica si el script se está ejecutando directamente

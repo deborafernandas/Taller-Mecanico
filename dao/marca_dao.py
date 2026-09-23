@@ -1,3 +1,4 @@
+import sqlite3  # Importa sqlite3 para capturar IntegrityError en restricciones de Foreign Key
 from dao.dao import Dao  # Importa la clase base Dao desde el módulo dao.dao
 from model.marca import Marca  # Importa la entidad Marca para reconstruir objetos de dominio
 
@@ -40,7 +41,7 @@ class MarcaDao(Dao):  # Define la clase MarcaDao que hereda de Dao
         fila = self.cursor.fetchone()  # Obtiene el primer (y único) registro coincidente
         
         if fila:  # Si la consulta encontró un registro
-            marca = Marca(fila[1])  # Reconstruye el objeto de dominio Marca con el nombre obtenido, instanciar
+            marca = Marca(fila[1])  # Reconstruye el objeto de dominio Marca con el nombre obtenido
             marca.id = fila[0]  # Asigna el ID numérico correspondiente desde la base de datos
             return marca  # Retorna el objeto Marca con todos sus datos cargados
         return None  # Retorna None si no se encontró ningún registro con ese ID
@@ -76,3 +77,25 @@ class MarcaDao(Dao):  # Define la clase MarcaDao que hereda de Dao
             return self.buscar(nueva_marca.id)  # Retorna el registro fresco consultado desde la BD
             
         return None  # Retorna None si el registro con ese ID no existía
+
+    def eliminar(self, id: int) -> bool:  # Elimina una marca por su ID
+        """
+        Elimina una marca de la base de datos según su ID.
+        Valida mediante cursor.rowcount si se eliminó el registro.
+        Retorna True si fue eliminada con éxito.
+        Retorna False si el ID no existe o si no se puede eliminar por restricción de integridad referencial (Foreign Key).
+        """
+        try:
+            sql = "DELETE FROM marcas WHERE id = ?"
+            self.cursor.execute(sql, (id,))  # Ejecuta la consulta de eliminación parametrizada
+            
+            if self.cursor.rowcount > 0:  # Valida que al menos una fila haya sido eliminada
+                self.conexion.commit()  # Confirma la eliminación en la base de datos
+                return True  # Retorna True confirmando el borrado
+                
+            return False  # Retorna False si el ID no existía en la tabla
+            
+        except sqlite3.IntegrityError as error:  # Captura error si la marca tiene modelos asociados
+            self.conexion.rollback()  # Revierte cualquier cambio pendiente
+            print(f"[RESTRICCIÓN] No se puede eliminar la marca ID {id} porque tiene modelos asociados: {error}")
+            return False  # Retorna False impidiendo violar la integridad referencial

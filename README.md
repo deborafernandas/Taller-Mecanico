@@ -20,6 +20,7 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
     - Método `buscar(id)`: ejecuta `SELECT ... WHERE id = ?`, obtiene el registro con `fetchone()` y reconstruye el objeto `Marca`, retornando `None` si no existe.
     - Método `listar()`: ejecuta `SELECT id, nombre FROM marcas` con `fetchall()` y retorna la lista completa de instancias de `Marca`.
     - Método `actualizar(nueva_marca)`: ejecuta `UPDATE marcas SET nombre = ? WHERE id = ?`, valida con `cursor.rowcount > 0` la existencia y modificación del registro, realiza el `commit()` y retorna el registro fresco usando `buscar(nueva_marca.id)` (retornando `None` si el ID no existe).
+    - Método `eliminar(id)`: ejecuta `DELETE FROM marcas WHERE id = ?`, valida con `cursor.rowcount > 0` si la fila fue borrada y confirma con `commit()`. Implementa bloque `try...except sqlite3.IntegrityError` con `rollback()` para proteger la integridad referencial ante claves foráneas activas si existen modelos asociados a la marca.
   - **`dao/modelo_dao.py`:**
     - Método `insertar(modelo)`: guarda el nombre y la clave foránea `marca_id` obtenida de `modelo.marca.id`, actualizando el `modelo.id` generado.
     - Método `buscar(id)` con `INNER JOIN`: une `modelos` con `marcas` para recuperar en una sola consulta relacional la jerarquía completa y reconstruir tanto el objeto `Marca` como el objeto `Modelo`.
@@ -29,7 +30,7 @@ Repositorio para la asignatura de Programación Orientada a Objetos Seguro.
     - Método `insertar(auto)`: aprovecha la herencia invocando a `super().insertar(auto)` para poblar la tabla padre `vehiculos` y registra la clave en la tabla hija `autos` (Table-per-type).
     - Método `buscar(patente)` con multi-JOIN: realiza `INNER JOIN` entre `autos`, `vehiculos`, `modelos` y `marcas`, reconstruyendo toda la jerarquía de objetos (`Marca` -> `Modelo` -> `Auto`) con sus métodos polimórficos (`tarifa_hora()`).
 - **Actualización y Validación Integral (`main.py`):**
-  - Se estructuró un flujo de pruebas que inicializa las tablas, inserta registros encadenados (`Marca` -> `Modelo` -> `Auto`), valida las búsquedas por ID y patente mediante JOINs y comprueba el retorno controlado de `None` ante identificadores inexistentes.
+  - Se estructuró un flujo de pruebas que inicializa las tablas, inserta registros encadenados (`Marca` -> `Modelo` -> `Auto`), valida las búsquedas por ID y patente mediante JOINs, comprueba la edición y eliminación con validación de retorno de registros, y comprueba el bloqueo seguro por integridad referencial ante intentos de borrar marcas con dependencias foráneas.
 
 ---
 
